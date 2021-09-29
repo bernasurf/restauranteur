@@ -5,12 +5,6 @@ export const MapContainer = (props) => {
   const [map, setMap] = useState(null);
   const { google, query } = props;
 
-  useEffect(() => {
-    if (query) {
-      searchByQuery(query);
-    }
-  }, [query]);
-
   function searchByQuery(query) {
     const service = new google.maps.places.PlacesService(map);
 
@@ -27,6 +21,12 @@ export const MapContainer = (props) => {
       }
     });
   }
+
+  useEffect(() => {
+    if (query) {
+      searchByQuery(query);
+    }
+  });
 
   function searchNearby(map, center) {
     const service = new google.maps.places.PlacesService(map);
