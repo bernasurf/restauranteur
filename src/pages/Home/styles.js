@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Slider from 'react-slick';
 
 export const Wrapper = styled.div`
   display: flex;
@@ -27,6 +28,13 @@ export const Logo = styled.img`
 export const Map = styled.div`
   background-color: grey;
   width: 500px;
+`;
+
+// you have to use () to style components... native html tags you can use only styled.element 
+export const Carousel = styled(Slider)`
+  .slick-slide {
+    margin-right: 16px;
+  }
 `;
 
 export const CarouselTitle = styled.h2`

@@ -6,8 +6,9 @@ import Slider from 'react-slick';
 
 import logo from '../../assets/logo.svg';
 import restaurantPlaceholder from '../../assets/restaurante-fake.png';
+import { Card } from '../../components';
 
-import { Wrapper, Container, Search, Logo, Map, CarouselTitle } from './styles';
+import { Wrapper, Container, Search, Logo, Map, Carousel, CarouselTitle } from './styles';
 
 const Home = () => {
   const [inputValue, setInputValue] = useState('');
@@ -37,23 +38,16 @@ const Home = () => {
             />
           </TextField>
           <CarouselTitle>In your area</CarouselTitle>
-          <Slider {...settings}>
-            <div>
-              <img src={restaurantPlaceholder} />
-            </div>
-            <div>
-              <img src={restaurantPlaceholder} />
-            </div>
-            <div>
-              <img src={restaurantPlaceholder} />
-            </div>
-            <div>
-              <img src={restaurantPlaceholder} />
-            </div>
-            <div>
-              <img src={restaurantPlaceholder} />
-            </div>
-          </Slider>
+          <Carousel {...settings}>
+            <Card image={restaurantPlaceholder} title="restaurant name" />
+            <Card image={restaurantPlaceholder} title="restaurant name2" />
+            <Card image={restaurantPlaceholder} title="restaurant name3" />
+            <Card image={restaurantPlaceholder} title="restaurant name4" />
+            <Card image={restaurantPlaceholder} title="restaurant name5" />
+            <Card image={restaurantPlaceholder} title="restaurant name6" />
+            <Card image={restaurantPlaceholder} title="restaurant name7" />
+            <Card image={restaurantPlaceholder} title="restaurant name8" />
+          </Carousel>
         </Search>
       </Container>
       <Map />
