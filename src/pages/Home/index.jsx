@@ -12,6 +12,7 @@ import { Wrapper, Container, Search, Logo, Carousel, CarouselTitle } from './sty
 
 const Home = () => {
   const [inputValue, setInputValue] = useState('');
+  const [query, setQuery] = useState(null);
   const [modalOpened, setModalOpened] = useState(false);
 
   const settings = {
@@ -22,6 +23,12 @@ const Home = () => {
     slidesToScrow: 4,
     adaptiveHeight: true,
   };
+
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      setQuery(inputValue);
+    }
+  }
 
   return (
     <Wrapper>
@@ -35,6 +42,7 @@ const Home = () => {
             <Input
               type="text"
               value={inputValue}
+              onKeyPress={handleKeyPress}
               onChange={(event) => setInputValue(event.target.value)}
             />
           </TextField>
@@ -55,7 +63,7 @@ const Home = () => {
         </Search>
         <RestaurantCard />
       </Container>
-      <Map />
+      <Map query={query} />
       <Modal open={modalOpened} onClose={() => setModalOpened(!modalOpened)} />
     </Wrapper>
   );
