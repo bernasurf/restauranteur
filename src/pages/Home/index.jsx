@@ -1,27 +1,55 @@
+/* eslint-disable react/jsx-indent */
+/* eslint-disable react/jsx-indent-props */
+/* eslint-disable camelcase */
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import TextField, { Input } from '@material/react-text-field';
 import MaterialIcon from '@material/react-material-icon';
-import Slider from 'react-slick';
+// import Slider from 'react-slick';
 
 import logo from '../../assets/logo.svg';
 import restaurantPlaceholder from '../../assets/restaurante-fake.png';
-import { Card, RestaurantCard, Modal } from '../../components';
+import { Card, RestaurantCard, Modal, Map, Loader, Skeleton } from '../../components';
 
-import { Wrapper, Container, Search, Logo, Map, Carousel, CarouselTitle } from './styles';
+import {
+  Wrapper,
+  Container,
+  Search,
+  Logo,
+  Carousel,
+  CarouselTitle,
+  ModalTitle,
+  ModalContent,
+} from './styles';
 
 const Home = () => {
   const [inputValue, setInputValue] = useState('');
+  const [query, setQuery] = useState(null);
+  const [placeId, setPlaceId] = useState(null);
   const [modalOpened, setModalOpened] = useState(false);
+  const { restaurants, restaurantSelected } = useSelector((state) => state.restaurants);
 
   const settings = {
     dots: false,
     infinite: true,
+    autoplay: true,
     speed: 500,
     slidesToShow: 4,
     slidesToScrow: 4,
     adaptiveHeight: true,
   };
+
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      setQuery(inputValue);
+    }
+  }
+
+  function handleOpenModal(placeId) {
+    setPlaceId(placeId);
+    setModalOpened(true);
+  }
 
   return (
     <Wrapper>
@@ -35,28 +63,58 @@ const Home = () => {
             <Input
               type="text"
               value={inputValue}
+              onKeyPress={handleKeyPress}
               onChange={(event) => setInputValue(event.target.value)}
             />
           </TextField>
-          <CarouselTitle>In your area</CarouselTitle>
-          <Carousel {...settings}>
-            <Card image={restaurantPlaceholder} title="restaurant name" />
-            <Card image={restaurantPlaceholder} title="restaurant name2" />
-            <Card image={restaurantPlaceholder} title="restaurant name3" />
-            <Card image={restaurantPlaceholder} title="restaurant name4" />
-            <Card image={restaurantPlaceholder} title="restaurant name5" />
-            <Card image={restaurantPlaceholder} title="restaurant name6" />
-            <Card image={restaurantPlaceholder} title="restaurant name7" />
-            <Card image={restaurantPlaceholder} title="restaurant name8" />
-          </Carousel>
-          <button type="button" onClick={() => setModalOpened(true)}>
-            Open/Test Modal
-          </button>
+          {restaurants.length > 0 ? (
+            <>
+              <CarouselTitle>In your area</CarouselTitle>
+              <Carousel {...settings}>
+                {restaurants.map((restaurant) => (
+                  <Card
+                    key={restaurant.place_id}
+                    image={
+                      restaurant.photos ? restaurant.photos[0].getUrl() : restaurantPlaceholder
+                    }
+                    title={restaurant.name}
+                  />
+                ))}
+              </Carousel>
+            </>
+          ) : (
+            <Loader />
+          )}
         </Search>
-        <RestaurantCard />
+        {restaurants.map((restaurant) => (
+          <RestaurantCard
+            onClick={() => handleOpenModal(restaurant.place_id)}
+            key={restaurant.place_id}
+            restaurant={restaurant}
+          />
+        ))}
       </Container>
-      <Map />
-      <Modal open={modalOpened} onClose={() => setModalOpened(!modalOpened)} />
+      <Map query={query} placeId={placeId} />
+      <Modal open={modalOpened} onClose={() => setModalOpened(!modalOpened)}>
+        {restaurantSelected ? (
+          <>
+            <ModalTitle>{restaurantSelected?.name}</ModalTitle>
+            <ModalContent>Phone: {restaurantSelected?.formatted_phone_number}</ModalContent>
+            <ModalContent>Address: {restaurantSelected?.formatted_address}</ModalContent>
+            <ModalContent>
+              Opening Hours:{' '}
+              {restaurantSelected?.opening_hours?.open_now ? 'Open Now :o)' : 'Closed Now :o('}
+            </ModalContent>
+          </>
+        ) : (
+          <>
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+          </>
+        )}
+      </Modal>
     </Wrapper>
   );
 };
