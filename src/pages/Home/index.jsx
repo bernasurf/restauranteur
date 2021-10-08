@@ -1,3 +1,6 @@
+/* eslint-disable react/jsx-indent */
+/* eslint-disable react/jsx-indent-props */
+/* eslint-disable camelcase */
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -7,19 +10,30 @@ import MaterialIcon from '@material/react-material-icon';
 
 import logo from '../../assets/logo.svg';
 import restaurantPlaceholder from '../../assets/restaurante-fake.png';
-import { Card, RestaurantCard, Modal, Map } from '../../components';
+import { Card, RestaurantCard, Modal, Map, Loader, Skeleton } from '../../components';
 
-import { Wrapper, Container, Search, Logo, Carousel, CarouselTitle } from './styles';
+import {
+  Wrapper,
+  Container,
+  Search,
+  Logo,
+  Carousel,
+  CarouselTitle,
+  ModalTitle,
+  ModalContent,
+} from './styles';
 
 const Home = () => {
   const [inputValue, setInputValue] = useState('');
   const [query, setQuery] = useState(null);
+  const [placeId, setPlaceId] = useState(null);
   const [modalOpened, setModalOpened] = useState(false);
-  const { restaurants } = useSelector((state) => state.restaurants);
+  const { restaurants, restaurantSelected } = useSelector((state) => state.restaurants);
 
   const settings = {
     dots: false,
     infinite: true,
+    autoplay: true,
     speed: 500,
     slidesToShow: 4,
     slidesToScrow: 4,
@@ -30,6 +44,11 @@ const Home = () => {
     if (event.key === 'Enter') {
       setQuery(inputValue);
     }
+  }
+
+  function handleOpenModal(placeId) {
+    setPlaceId(placeId);
+    setModalOpened(true);
   }
 
   return (
@@ -48,26 +67,54 @@ const Home = () => {
               onChange={(event) => setInputValue(event.target.value)}
             />
           </TextField>
-          <CarouselTitle>In your area</CarouselTitle>
-          <Carousel {...settings}>
-            {restaurants.map((restaurant) => (
-              <Card
-                key={restaurant.place_id}
-                image={restaurant.photos ? restaurant.photos[0].getUrl() : restaurantPlaceholder}
-                title={restaurant.name}
-              />
-            ))}
-          </Carousel>
-          <button type="button" onClick={() => setModalOpened(true)}>
-            Open/Test Modal
-          </button>
+          {restaurants.length > 0 ? (
+            <>
+              <CarouselTitle>In your area</CarouselTitle>
+              <Carousel {...settings}>
+                {restaurants.map((restaurant) => (
+                  <Card
+                    key={restaurant.place_id}
+                    image={
+                      restaurant.photos ? restaurant.photos[0].getUrl() : restaurantPlaceholder
+                    }
+                    title={restaurant.name}
+                  />
+                ))}
+              </Carousel>
+            </>
+          ) : (
+            <Loader />
+          )}
         </Search>
         {restaurants.map((restaurant) => (
-          <RestaurantCard key={restaurant.place_id} restaurant={restaurant} />
+          <RestaurantCard
+            onClick={() => handleOpenModal(restaurant.place_id)}
+            key={restaurant.place_id}
+            restaurant={restaurant}
+          />
         ))}
       </Container>
-      <Map query={query} />
-      <Modal open={modalOpened} onClose={() => setModalOpened(!modalOpened)} />
+      <Map query={query} placeId={placeId} />
+      <Modal open={modalOpened} onClose={() => setModalOpened(!modalOpened)}>
+        {restaurantSelected ? (
+          <>
+            <ModalTitle>{restaurantSelected?.name}</ModalTitle>
+            <ModalContent>Phone: {restaurantSelected?.formatted_phone_number}</ModalContent>
+            <ModalContent>Address: {restaurantSelected?.formatted_address}</ModalContent>
+            <ModalContent>
+              Opening Hours:{' '}
+              {restaurantSelected?.opening_hours?.open_now ? 'Open Now :o)' : 'Closed Now :o('}
+            </ModalContent>
+          </>
+        ) : (
+          <>
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+          </>
+        )}
+      </Modal>
     </Wrapper>
   );
 };

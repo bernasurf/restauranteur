@@ -30,7 +30,7 @@ export const Map = styled.div`
   width: 500px;
 `;
 
-// you have to use () to style components... native html tags you can use only styled.element 
+// you have to use () to style components... native html tags you can use only styled.element
 export const Carousel = styled(Slider)`
   .slick-slide {
     margin-right: 16px;
@@ -44,4 +44,23 @@ export const CarouselTitle = styled.h2`
   font-weight: bold;
   line-height: 29px;
   margin: 16px 0;
+`;
+
+export const ModalTitle = styled.h2`
+  margin-bottom: 10px;
+  letter-spacing: 0.11px;
+  font-family: ${(props) => props.theme.fonts.regular};
+  color: ${(props) => props.theme.colors.text};
+  line-height: 29px;
+  font-size: 24px;
+  font-weight: bold;
+`;
+
+export const ModalContent = styled.p`
+  margin-bottom: 10px;
+  font-family: ${(props) => props.theme.fonts.regular};
+  color: ${(props) => props.theme.colors.text};
+  line-height: 19px;
+  font-size: 16px;
+  font-weight: normal;
 `;
