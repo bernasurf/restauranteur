@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoogleApiWrapper, Map, Marker } from 'google-maps-react';
 
@@ -10,49 +10,57 @@ export const MapContainer = (props) => {
   const { restaurants } = useSelector((state) => state.restaurants); // de-structure to retrieve only the restaurants array from the redux store
   const { google, query, placeId } = props;
 
-  function searchByQuery(query) {
-    const service = new google.maps.places.PlacesService(map);
+  const searchByQuery = useCallback(
+    (map, query) => {
+      const service = new google.maps.places.PlacesService(map);
+      dispatch(setRestaurants([]));
 
-    const request = {
-      location: map.center,
-      radius: '500',
-      type: ['restaurant'],
-      query,
-    };
+      const request = {
+        location: map.center,
+        radius: '500',
+        type: ['restaurant'],
+        query,
+      };
 
-    service.textSearch(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        dispatch(setRestaurants(results));
-      }
-    });
-  }
+      service.textSearch(request, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          dispatch(setRestaurants(results));
+        }
+      });
+    },
+    [dispatch, google]
+  );
 
   useEffect(() => {
     if (query) {
-      searchByQuery(query);
+      searchByQuery(map, query);
     }
-  });
+  }, [searchByQuery, query, map]);
 
-  function getRestaurantDetails(placeId) {
-    const service = new google.maps.places.PlacesService(map);
+  const getRestaurantDetails = useCallback(
+    (placeId) => {
+      const service = new google.maps.places.PlacesService(map);
+      dispatch(setRestaurant(null));
 
-    const request = {
-      placeId,
-      fields: ['name', 'opening_hours', 'formatted_address', 'formatted_phone_number'],
-    };
+      const request = {
+        placeId,
+        fields: ['name', 'opening_hours', 'formatted_address', 'formatted_phone_number'],
+      };
 
-    service.getDetails(request, (place, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        dispatch(setRestaurant(place));
-      }
-    });
-  }
+      service.getDetails(request, (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          dispatch(setRestaurant(place));
+        }
+      });
+    },
+    [google, map, dispatch]
+  );
 
   useEffect(() => {
     if (placeId) {
       getRestaurantDetails(placeId);
     }
-  });
+  }, [placeId, getRestaurantDetails]);
 
   function searchNearby(map, center) {
     const service = new google.maps.places.PlacesService(map);
