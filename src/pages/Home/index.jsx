@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import TextField, { Input } from '@material/react-text-field';
 import MaterialIcon from '@material/react-material-icon';
 // import Slider from 'react-slick';
@@ -14,6 +15,7 @@ const Home = () => {
   const [inputValue, setInputValue] = useState('');
   const [query, setQuery] = useState(null);
   const [modalOpened, setModalOpened] = useState(false);
+  const { restaurants } = useSelector((state) => state.restaurants);
 
   const settings = {
     dots: false,
@@ -48,20 +50,21 @@ const Home = () => {
           </TextField>
           <CarouselTitle>In your area</CarouselTitle>
           <Carousel {...settings}>
-            <Card image={restaurantPlaceholder} title="restaurant name" />
-            <Card image={restaurantPlaceholder} title="restaurant name2" />
-            <Card image={restaurantPlaceholder} title="restaurant name3" />
-            <Card image={restaurantPlaceholder} title="restaurant name4" />
-            <Card image={restaurantPlaceholder} title="restaurant name5" />
-            <Card image={restaurantPlaceholder} title="restaurant name6" />
-            <Card image={restaurantPlaceholder} title="restaurant name7" />
-            <Card image={restaurantPlaceholder} title="restaurant name8" />
+            {restaurants.map((restaurant) => (
+              <Card
+                key={restaurant.place_id}
+                image={restaurant.photos ? restaurant.photos[0].getUrl() : restaurantPlaceholder}
+                title={restaurant.name}
+              />
+            ))}
           </Carousel>
           <button type="button" onClick={() => setModalOpened(true)}>
             Open/Test Modal
           </button>
         </Search>
-        <RestaurantCard />
+        {restaurants.map((restaurant) => (
+          <RestaurantCard key={restaurant.place_id} restaurant={restaurant} />
+        ))}
       </Container>
       <Map query={query} />
       <Modal open={modalOpened} onClose={() => setModalOpened(!modalOpened)} />
