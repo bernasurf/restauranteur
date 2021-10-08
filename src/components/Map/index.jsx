@@ -6,8 +6,8 @@ import { setRestaurants, setRestaurant } from '../../redux/modules/restaurants';
 
 export const MapContainer = (props) => {
   const dispatch = useDispatch();
-  const { restaurants } = useSelector((state) => state.restaurants); // de-structure to retrieve only the restaurants array from the redux store
   const [map, setMap] = useState(null);
+  const { restaurants } = useSelector((state) => state.restaurants); // de-structure to retrieve only the restaurants array from the redux store
   const { google, query, placeId } = props;
 
   function searchByQuery(query) {

@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-indent */
+/* eslint-disable react/jsx-indent-props */
 /* eslint-disable camelcase */
 /* eslint-disable jsx-a11y/alt-text */
 import React, { useState } from 'react';
@@ -8,7 +10,7 @@ import MaterialIcon from '@material/react-material-icon';
 
 import logo from '../../assets/logo.svg';
 import restaurantPlaceholder from '../../assets/restaurante-fake.png';
-import { Card, RestaurantCard, Modal, Map } from '../../components';
+import { Card, RestaurantCard, Modal, Map, Loader, Skeleton } from '../../components';
 
 import {
   Wrapper,
@@ -65,16 +67,24 @@ const Home = () => {
               onChange={(event) => setInputValue(event.target.value)}
             />
           </TextField>
-          <CarouselTitle>In your area</CarouselTitle>
-          <Carousel {...settings}>
-            {restaurants.map((restaurant) => (
-              <Card
-                key={restaurant.place_id}
-                image={restaurant.photos ? restaurant.photos[0].getUrl() : restaurantPlaceholder}
-                title={restaurant.name}
-              />
-            ))}
-          </Carousel>
+          {restaurants.length > 0 ? (
+            <>
+              <CarouselTitle>In your area</CarouselTitle>
+              <Carousel {...settings}>
+                {restaurants.map((restaurant) => (
+                  <Card
+                    key={restaurant.place_id}
+                    image={
+                      restaurant.photos ? restaurant.photos[0].getUrl() : restaurantPlaceholder
+                    }
+                    title={restaurant.name}
+                  />
+                ))}
+              </Carousel>
+            </>
+          ) : (
+            <Loader />
+          )}
         </Search>
         {restaurants.map((restaurant) => (
           <RestaurantCard
@@ -86,13 +96,24 @@ const Home = () => {
       </Container>
       <Map query={query} placeId={placeId} />
       <Modal open={modalOpened} onClose={() => setModalOpened(!modalOpened)}>
-        <ModalTitle>{restaurantSelected?.name}</ModalTitle>
-        <ModalContent>Phone: {restaurantSelected?.formatted_phone_number}</ModalContent>
-        <ModalContent>Address: {restaurantSelected?.formatted_address}</ModalContent>
-        <ModalContent>
-          Opening Hours:{' '}
-          {restaurantSelected?.opening_hours?.open_now ? 'Open Now :o)' : 'Closed Now :o('}
-        </ModalContent>
+        {restaurantSelected ? (
+          <>
+            <ModalTitle>{restaurantSelected?.name}</ModalTitle>
+            <ModalContent>Phone: {restaurantSelected?.formatted_phone_number}</ModalContent>
+            <ModalContent>Address: {restaurantSelected?.formatted_address}</ModalContent>
+            <ModalContent>
+              Opening Hours:{' '}
+              {restaurantSelected?.opening_hours?.open_now ? 'Open Now :o)' : 'Closed Now :o('}
+            </ModalContent>
+          </>
+        ) : (
+          <>
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+            <Skeleton width="10px" height="10px" />
+          </>
+        )}
       </Modal>
     </Wrapper>
   );
